@@ -1,0 +1,111 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${PROJECT}-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: media_scraper
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ${PROJECT}-network
+    # Resource limits for 1 CPU, 1GB RAM constraint
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: 300M
+
+  # Redis for caching and queue
+  redis:
+    image: redis:7-alpine
+    container_name: ${PROJECT}-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ${PROJECT}-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 100M
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ${PROJECT}-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ${PROJECT}-network
+    # Resource limits for handling ~5000 requests with limited resources
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 400M
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ${PROJECT}-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      - backend
+    networks:
+      - ${PROJECT}-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 200M
+  nginx:
+    container_name: ${PROJECT}-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  media-scraper-network:
+    driver: bridge
