@@ -6,9 +6,6 @@ import { BulkScrapeResponse, ScrapedMedia, ScrapeJobResult, ScrapeStatus } from 
 import { logger } from "../utils/logger";
 import { scraperService } from "./scraper.service";
 
-/**
- * Represents a job in the scraping queue.
- */
 interface QueuedJob {
   readonly id: string;
   readonly url: string;
@@ -17,10 +14,6 @@ interface QueuedJob {
 
 const CHUNK_SIZE = 100;
 
-/**
- * Service responsible for managing the scraping queue and processing scrape jobs.
- * Handles concurrent scraping with retry logic and database persistence.
- */
 export class ScrapeQueueService {
   private readonly concurrencyLimit: number;
   private readonly maxRetries: number;
@@ -30,11 +23,6 @@ export class ScrapeQueueService {
     this.maxRetries = config.scraper.maxRetries;
   }
 
-  /**
-   * Processes multiple URLs for scraping in bulk.
-   * @param urls - Array of URLs to scrape
-   * @returns Response containing results for all scrape jobs
-   */
   public async processBulkScrape(urls: string[]): Promise<BulkScrapeResponse> {
     const results: ScrapeJobResult[] = [];
     const limit = pLimit(this.concurrencyLimit);
@@ -70,11 +58,6 @@ export class ScrapeQueueService {
     }
   }
 
-  /**
-   * Gets the status of a scrape job.
-   * @param requestId - The ID of the scrape request
-   * @returns The job status or null if not found
-   */
   public async fetchJobStatus(requestId: string): Promise<ScrapeJobResult | null> {
     const request = await scrapeRequestRepository.findById(requestId);
     if (!request) {
@@ -91,9 +74,6 @@ export class ScrapeQueueService {
     };
   }
 
-  /**
-   * Processes a single scrape job with retry logic.
-   */
   private async processJob(job: QueuedJob): Promise<ScrapeJobResult> {
     const { id, url } = job;
 
@@ -134,9 +114,6 @@ export class ScrapeQueueService {
     }
   }
 
-  /**
-   * Saves scraped media to the database in chunks.
-   */
   private async saveMedia(scrapeRequestId: string, sourceUrl: string, media: ScrapedMedia[]): Promise<number> {
     if (media.length === 0) {
       return 0;
