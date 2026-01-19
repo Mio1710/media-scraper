@@ -29,15 +29,12 @@ export class ScrapeQueueService {
     const transaction = await sequelize.transaction();
 
     try {
-      const scrapeRequests = await scrapeRequestRepository.createBulkRequests(
-        urls.map((url) => ({ sourceUrl: url, status: ScrapeStatus.PENDING })),
-        transaction,
-      );
+      const scrapeRequests = await scrapeRequestRepository.createBulkRequests(urls, transaction);
       await transaction.commit();
 
-      const jobs: QueuedJob[] = scrapeRequests.map((req, index) => ({
-        id: req.id,
-        url: urls[index],
+      const jobs: QueuedJob[] = scrapeRequests.map((scrap) => ({
+        id: scrap.id,
+        url: scrap.sourceUrl,
         retries: 0,
       }));
 

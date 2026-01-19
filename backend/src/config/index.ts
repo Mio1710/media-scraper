@@ -34,7 +34,9 @@ interface ServerConfig {
 interface ScraperConfig {
   maxConcurrentScrapes: number;
   scrapeTimeout: number;
+  userAgent: string;
   maxRetries: number;
+  maxBodyLength: number;
 }
 
 interface RateLimitConfig {
@@ -102,7 +104,12 @@ export const config: AppConfig = {
   scraper: {
     maxConcurrentScrapes: getEnvNumber("MAX_CONCURRENT_SCRAPES", 100),
     scrapeTimeout: getEnvNumber("SCRAPE_TIMEOUT", 30000),
+    userAgent: getEnvString(
+      "SCRAPER_USER_AGENT",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    ),
     maxRetries: getEnvNumber("MAX_RETRIES", 3),
+    maxBodyLength: 10 * 1024 * 1024, // 10 MB
   },
   rateLimit: {
     windowMs: getEnvNumber("RATE_LIMIT_WINDOW_MS", 60000),

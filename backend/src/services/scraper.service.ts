@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import * as cheerio from "cheerio";
 import { Element } from "domhandler";
 import { URL } from "url";
-import { config } from "../config";
+import config from "../config";
 import { MediaType, ScrapedMedia } from "../types";
 import { logger } from "../utils/logger";
 
@@ -11,12 +11,11 @@ import { logger } from "../utils/logger";
  */
 interface ScraperOptions {
   readonly timeout: number;
+  readonly maxContentLength: number;
   readonly userAgent: string;
 }
 
-const DEFAULT_USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-
+const MAX_CONTENT_LENGTH = 10 * 1024 * 1024; // 10 MB
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".ico"] as const;
 const VIDEO_EXTENSIONS = [".mp4", ".webm", ".ogg", ".avi", ".mov", ".wmv", ".flv", ".mkv"] as const;
 
@@ -28,21 +27,6 @@ const MAX_ALT_LENGTH = 1000;
  * Uses Cheerio for HTML parsing and Axios for HTTP requests.
  */
 export class ScraperService {
-  private readonly options: ScraperOptions;
-
-  constructor(options?: Partial<ScraperOptions>) {
-    this.options = {
-      timeout: options?.timeout ?? config.scraper.scrapeTimeout,
-      userAgent: options?.userAgent ?? DEFAULT_USER_AGENT,
-    };
-  }
-
-  /**
-   * Scrapes a URL and extracts all media (images and videos).
-   * @param url - The URL to scrape
-   * @returns Array of scraped media items
-   * @throws Error if the URL cannot be fetched
-   */
   public async scrapeUrl(url: string): Promise<ScrapedMedia[]> {
     const media: ScrapedMedia[] = [];
     const seenUrls = new Set<string>();
@@ -74,26 +58,21 @@ export class ScraperService {
     }
   }
 
-  /**
-   * Fetches the HTML content of a page.
-   */
   private async fetchPageContent(url: string): Promise<string> {
     const response = await axios.get<string>(url, {
-      timeout: this.options.timeout,
+      timeout: config.scraper.scrapeTimeout,
+      maxBodyLength: config.scraper.maxBodyLength,
       headers: {
-        "User-Agent": this.options.userAgent,
+        "User-Agent": config.scraper.userAgent,
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.5",
       },
-      maxRedirects: 5,
+      maxRedirects: 3,
       responseType: "text",
     });
     return response.data;
   }
 
-  /**
-   * Extracts images from <img> tags.
-   */
   private extractImagesFromImgTags(
     $: cheerio.CheerioAPI,
     baseUrl: string,

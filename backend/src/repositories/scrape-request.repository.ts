@@ -18,14 +18,11 @@ export class ScrapeRequestRepository {
     );
   }
 
-  public async createBulkRequests(
-    data: CreateScrapeRequestData[],
-    transaction?: Transaction,
-  ): Promise<ScrapeRequestModel[]> {
+  public async createBulkRequests(data: string[], transaction: Transaction): Promise<ScrapeRequestModel[]> {
     return ScrapeRequestModel.bulkCreate(
-      data.map((d) => ({
-        ...d,
-        status: d.status ?? ScrapeStatus.PENDING,
+      data.map((sourceUrl) => ({
+        sourceUrl,
+        status: ScrapeStatus.PENDING,
       })),
       { transaction },
     );
