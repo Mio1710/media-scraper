@@ -17,4 +17,16 @@ export class ScraperService {
     }
     return response.data.data;
   }
+
+  static async getScrapeHistory(page: number, limit: number, status?: string): Promise<ApiResponse<ScrapeJobResult[]>> {
+    const params: Record<string, any> = { page, limit };
+    if (status) {
+      params.status = status;
+    }
+    const response = await axiosInstance.get<ApiResponse<ScrapeJobResult[]>>("/scrape", { params });
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Failed to get scrape history");
+    }
+    return response.data;
+  }
 }

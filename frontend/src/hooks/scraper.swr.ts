@@ -43,3 +43,15 @@ export const useScrapeStatus = (id: string | null) => {
   );
   return { data, error, isLoading };
 };
+
+export const useScrapeHistory = ({ page, limit, status }: { page: number; limit: number; status?: string }) => {
+  const {
+    data,
+    error,
+    isLoading,
+    mutate: revalidate,
+  } = useSWR(["scrapeHistory", page, limit, status], () => ScraperService.getScrapeHistory(page, limit, status), {
+    revalidateOnFocus: false,
+  });
+  return { data, error, isLoading, refetch: revalidate };
+};

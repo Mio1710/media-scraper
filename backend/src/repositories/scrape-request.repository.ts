@@ -94,19 +94,20 @@ export class ScrapeRequestRepository {
             as: "media",
           },
         ],
+        distinct: true,
       });
       rows.map((row) => {
         (row as any).dataValues.mediaCount = (row as any).media ? (row as any).media.length : 0;
         delete (row as any).dataValues.media;
       });
 
-      const totalPages = Math.ceil((Array.isArray(count) ? count.length : count) / limit);
+      const totalPages = Math.ceil(count / limit);
       return {
         data: rows as unknown as ScrapeJobResult[],
         pagination: {
           page,
           limit,
-          totalItems: Array.isArray(count) ? count.length : count,
+          totalItems: count,
           totalPages,
         },
       };
