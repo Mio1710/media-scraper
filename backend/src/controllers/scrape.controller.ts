@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import { ApiResponse, PaginatedResponse } from "../interfaces/pagination";
+import { scraperService } from "../services";
 import { scrapeQueueService } from "../services/scrape-queue.service";
-import { ApiResponse, BulkScrapeResponse, ScrapeJobResult } from "../types";
+import { BulkScrapeResponse, ScrapeJobResult } from "../types/scraper";
 import { logger } from "../utils/logger";
 import { ScrapeUrlsInput } from "../utils/validators";
 
@@ -19,6 +21,24 @@ export class ScrapeController {
         success: true,
         data: result,
         message: `Processing ${urls.length} URLs`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get /api/scrape
+  public async getScrapeHistory(
+    _req: Request,
+    res: Response<ApiResponse<PaginatedResponse<ScrapeJobResult>>>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { page, limit, status } = res.locals.validated;
+      const result = await scraperService.fetchScrapeHistory({ page, limit }, status);
+      res.json({
+        success: true,
+        data: result,
       });
     } catch (error) {
       next(error);

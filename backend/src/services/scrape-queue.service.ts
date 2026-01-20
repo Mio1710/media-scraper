@@ -3,7 +3,7 @@ import { config } from "../config";
 import sequelize from "../config/database";
 import { ICreateMedia } from "../interfaces";
 import { mediaRepository, scrapeRequestRepository } from "../repositories";
-import { BulkScrapeResponse, ScrapedMedia, ScrapeJobResult, ScrapeStatus } from "../types";
+import { BulkScrapeResponse, ScrapedMedia, ScrapeJobResult, ScrapeStatus } from "../types/scraper";
 import { logger } from "../utils/logger";
 import { scraperService } from "./scraper.service";
 
@@ -64,7 +64,7 @@ export class ScrapeQueueService {
     const media = await mediaRepository.findByScrapeRequestId(requestId);
 
     return {
-      requestId: request.id,
+      id: request.id,
       sourceUrl: request.sourceUrl,
       status: request.status,
       mediaCount: media.length,
@@ -86,7 +86,7 @@ export class ScrapeQueueService {
       logger.info(`Completed scrape job ${id}: found ${mediaCount} media items`);
 
       return {
-        requestId: id,
+        id,
         sourceUrl: url,
         status: ScrapeStatus.COMPLETED,
         mediaCount,
@@ -103,7 +103,7 @@ export class ScrapeQueueService {
       logger.error(`Failed scrape job ${id}: ${errorMessage}`);
 
       return {
-        requestId: id,
+        id,
         sourceUrl: url,
         status: ScrapeStatus.FAILED,
         mediaCount: 0,

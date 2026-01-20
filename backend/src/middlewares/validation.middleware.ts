@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { ApiResponse } from "../types";
+import { ApiResponse } from "../interfaces/pagination";
 
 type ValidationSource = "body" | "query" | "params";
 

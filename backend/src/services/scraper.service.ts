@@ -3,7 +3,10 @@ import * as cheerio from "cheerio";
 import { Element } from "domhandler";
 import { URL } from "url";
 import config from "../config";
-import { MediaType, ScrapedMedia } from "../types";
+import { PaginatedResponse } from "../interfaces/pagination";
+import { scrapeRequestRepository } from "../repositories";
+import { MediaType } from "../types";
+import { ScrapedMedia, ScrapeJobResult, ScrapeStatus } from "../types/scraper";
 import { logger } from "../utils/logger";
 
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".ico"] as const;
@@ -12,12 +15,23 @@ const VIDEO_EXTENSIONS = [".mp4", ".webm", ".ogg", ".avi", ".mov", ".wmv", ".flv
 const MAX_ALT_LENGTH = 1000;
 
 export class ScraperService {
+  public async fetchScrapeHistory(
+    pagination: { page: number; limit: number },
+    status?: ScrapeStatus,
+  ): Promise<PaginatedResponse<ScrapeJobResult>> {
+    const { data, pagination: pag } = await scrapeRequestRepository.findAllPaginated(pagination, status);
+
+    return {
+      data,
+      pagination: pag,
+    };
+  }
   public async scrapeUrl(url: string): Promise<ScrapedMedia[]> {
     const media: ScrapedMedia[] = [];
     const seenUrls = new Set<string>();
 
     try {
-      logger.debug(`Scraping URL: ${url}`);
+      logger.info(`Scraping URL: ${url}`);
       const htmlContent = await this.fetchPageContent(url);
       const $ = cheerio.load(htmlContent);
 
@@ -28,7 +42,7 @@ export class ScraperService {
       this.extractBackgroundImages($, url, media, seenUrls);
       this.extractOpenGraphMedia($, url, media, seenUrls);
 
-      logger.debug(`Found ${media.length} media items from ${url}`);
+      logger.info(`Found ${media.length} media items from ${url}`);
       return media;
     } catch (error) {
       if (error instanceof AxiosError) {

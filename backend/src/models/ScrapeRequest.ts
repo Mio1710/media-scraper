@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
-import { ScrapeStatus } from "../types";
+import { ScrapeStatus } from "../types/scraper";
 
 class ScrapeRequestModel extends Model {
   declare id: string;

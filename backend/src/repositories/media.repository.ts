@@ -1,7 +1,8 @@
 import { Op, Transaction, WhereOptions } from "sequelize";
 import { ICreateMedia, Media } from "../interfaces";
+import { PaginatedResponse, PaginationParams } from "../interfaces/pagination";
 import MediaModel from "../models/Media";
-import { MediaFilter, MediaType, PaginatedResponse, PaginationParams } from "../types";
+import { MediaFilter, MediaType } from "../types";
 
 export class MediaRepository {
   public async createMedia(data: ICreateMedia, transaction?: Transaction): Promise<MediaModel> {
@@ -48,8 +49,6 @@ export class MediaRepository {
         limit,
         totalItems: count,
         totalPages,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
       },
     };
   }

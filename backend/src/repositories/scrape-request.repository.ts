@@ -1,6 +1,8 @@
 import { Transaction } from "sequelize";
+import sequelize from "../config/database";
+import { PaginatedResponse } from "../interfaces/pagination";
 import ScrapeRequestModel from "../models/ScrapeRequest";
-import { ScrapeStatus } from "../types";
+import { ScrapeJobResult, ScrapeStatus } from "../types/scraper";
 
 interface CreateScrapeRequestData {
   readonly sourceUrl: string;
@@ -69,6 +71,40 @@ export class ScrapeRequestRepository {
 
   public async deleteById(id: string, transaction?: Transaction): Promise<number> {
     return ScrapeRequestModel.destroy({ where: { id }, transaction });
+  }
+
+  public async findAllPaginated(
+    pagination: { page: number; limit: number },
+    status?: ScrapeStatus,
+  ): Promise<PaginatedResponse<ScrapeJobResult>> {
+    const { page, limit } = pagination;
+    const offset = (page - 1) * limit;
+    const whereClause = status ? { status } : {};
+    const { rows, count } = await ScrapeRequestModel.findAndCountAll({
+      attributes: [
+        "id",
+        "sourceUrl",
+        "status",
+        "errorMessage",
+        "createdAt",
+        "updatedAt",
+        [sequelize.fn("COUNT", sequelize.col("Media.id")), "mediaCount"],
+      ],
+      where: whereClause,
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
+    const totalPages = Math.ceil(count / limit);
+    return {
+      data: rows as unknown as ScrapeJobResult[],
+      pagination: {
+        page,
+        limit,
+        totalItems: count,
+        totalPages,
+      },
+    };
   }
 }
 

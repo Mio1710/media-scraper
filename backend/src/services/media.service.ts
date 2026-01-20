@@ -1,7 +1,8 @@
 import { config } from "../config";
 import { Media } from "../interfaces";
+import { PaginatedResponse, PaginationParams } from "../interfaces/pagination";
 import { mediaRepository } from "../repositories";
-import { MediaFilter, PaginatedResponse, PaginationParams } from "../types";
+import { MediaFilter } from "../types";
 
 export class MediaService {
   public async fetchMediaPaginated(
