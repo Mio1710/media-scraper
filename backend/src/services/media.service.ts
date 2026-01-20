@@ -20,12 +20,12 @@ export class MediaService {
     if (!media) {
       return null;
     }
-    return media.toJSON() as Media;
+    return media;
   }
 
   public async fetchMediaByScrapeRequest(scrapeRequestId: string): Promise<Media[]> {
     const media = await mediaRepository.findByScrapeRequestId(scrapeRequestId);
-    return media.map((m) => m.toJSON() as Media);
+    return media;
   }
 
   public async fetchMediaStats(): Promise<{ type: string; count: number }[]> {

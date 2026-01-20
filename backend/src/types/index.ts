@@ -20,8 +20,6 @@ export interface ScrapedMedia {
   url: string;
   type: MediaType;
   alt?: string;
-  width?: number;
-  height?: number;
 }
 
 export interface ScrapeResult {

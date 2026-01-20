@@ -15,7 +15,7 @@ export class MediaRepository {
     });
   }
 
-  public async findById(id: string): Promise<MediaModel | null> {
+  public async findById(id: string): Promise<Media | null> {
     return MediaModel.findByPk(id);
   }
 
@@ -42,7 +42,7 @@ export class MediaRepository {
     });
     const totalPages = Math.ceil(count / limit);
     return {
-      data: rows.map((row) => row.toJSON() as Media),
+      data: rows,
       pagination: {
         page,
         limit,

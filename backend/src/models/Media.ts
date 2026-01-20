@@ -9,7 +9,7 @@ class MediaModel extends Model<CreateMediaAttr> {
   declare scrapeRequestId: string;
   declare url: string;
   declare type: MediaType;
-  declare alt: string | null;
+  declare alt?: string;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 }

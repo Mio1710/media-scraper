@@ -6,26 +6,11 @@ import config from "../config";
 import { MediaType, ScrapedMedia } from "../types";
 import { logger } from "../utils/logger";
 
-/**
- * Configuration options for the scraper service.
- */
-interface ScraperOptions {
-  readonly timeout: number;
-  readonly maxContentLength: number;
-  readonly userAgent: string;
-}
-
-const MAX_CONTENT_LENGTH = 10 * 1024 * 1024; // 10 MB
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".ico"] as const;
 const VIDEO_EXTENSIONS = [".mp4", ".webm", ".ogg", ".avi", ".mov", ".wmv", ".flv", ".mkv"] as const;
 
-const MAX_TITLE_LENGTH = 500;
 const MAX_ALT_LENGTH = 1000;
 
-/**
- * Service responsible for scraping media (images and videos) from web pages.
- * Uses Cheerio for HTML parsing and Axios for HTTP requests.
- */
 export class ScraperService {
   public async scrapeUrl(url: string): Promise<ScrapedMedia[]> {
     const media: ScrapedMedia[] = [];
@@ -84,9 +69,6 @@ export class ScraperService {
       const dataSrc = $(element).attr("data-src");
       const srcset = $(element).attr("srcset");
       const alt = $(element).attr("alt");
-      const title = $(element).attr("title");
-      const width = $(element).attr("width");
-      const height = $(element).attr("height");
 
       const imageSources = [src, dataSrc];
       if (srcset) {
@@ -142,9 +124,6 @@ export class ScraperService {
     $("video").each((_: number, element: Element) => {
       const src = $(element).attr("src");
       const poster = $(element).attr("poster");
-      const title = $(element).attr("title");
-      const width = $(element).attr("width");
-      const height = $(element).attr("height");
 
       if (src) {
         const resolvedUrl = this.resolveUrl(baseUrl, src);
@@ -246,8 +225,6 @@ export class ScraperService {
     media: ScrapedMedia[],
     seenUrls: Set<string>,
   ): void {
-    const ogTitle = $('meta[property="og:title"]').attr("content")?.substring(0, MAX_TITLE_LENGTH);
-
     $('meta[property="og:image"]').each((_: number, element: Element) => {
       const content = $(element).attr("content");
       if (!content) return;
@@ -297,15 +274,6 @@ export class ScraperService {
       if (lowercaseUrl.includes(ext)) return MediaType.VIDEO;
     }
     return null;
-  }
-
-  /**
-   * Parses a width/height string value to a number.
-   */
-  private parseWidthHeight(value: string | undefined): number | undefined {
-    if (!value) return undefined;
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? undefined : parsed;
   }
 }
 
