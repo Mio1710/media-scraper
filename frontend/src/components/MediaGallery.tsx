@@ -1,6 +1,6 @@
 import { AlertCircle, Image as ImageIcon, Loader2, Video } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
-import { useDeleteMedia, useMedia, useMediaStats } from "../hooks/useApi";
+import { useDeleteMedia, useMediaStats, useMediaSWR } from "../hooks/media.swr";
 import { MediaType } from "../types";
 import { MediaCard } from "./MediaCard";
 import { Pagination } from "./Pagination";
@@ -54,7 +54,7 @@ export const MediaGallery: React.FC = () => {
     [page, typeFilter, debouncedSearch],
   );
 
-  const { data, isLoading, error, refetch } = useMedia(queryParams);
+  const { data, isLoading, error, refetch } = useMediaSWR(queryParams);
   const { data: stats } = useMediaStats();
   const deleteMedia = useDeleteMedia();
 

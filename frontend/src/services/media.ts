@@ -1,21 +1,10 @@
 import axiosInstance from "@/utils/axios";
 import { ApiResponse, Media, MediaQueryParams, MediaStats, PaginatedResponse } from "../types";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
-
 export class MediaService {
   // Media endpoints
   static async getMedia(params: MediaQueryParams = {}): Promise<PaginatedResponse<Media>> {
-    const queryParams = new URLSearchParams();
-
-    if (params.page) queryParams.set("page", params.page.toString());
-    if (params.limit) queryParams.set("limit", params.limit.toString());
-    if (params.type) queryParams.set("type", params.type);
-    if (params.search) queryParams.set("search", params.search);
-    if (params.sourceUrl) queryParams.set("sourceUrl", params.sourceUrl);
-
-    const response = await axiosInstance.get<ApiResponse<PaginatedResponse<Media>>>(`/media?${queryParams.toString()}`);
-
+    const response = await axiosInstance.get<ApiResponse<PaginatedResponse<Media>>>("/media", { params });
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.message || "Failed to fetch media");
     }

@@ -1,7 +1,7 @@
+import { useScrapeUrls } from "@/hooks/scraper.swr";
 import { CheckCircle, Link as LinkIcon, Loader2, Plus, X, XCircle } from "lucide-react";
 import React, { useCallback, useState } from "react";
-import { useScrapeUrls } from "../hooks/useApi";
-import { ScrapeJobResult, ScrapeStatus } from "../types";
+import { ScrapeJobResult, ScrapeStatus } from "../../types";
 
 interface UrlInput {
   readonly id: number;

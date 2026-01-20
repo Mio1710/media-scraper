@@ -1,7 +1,20 @@
-import { Camera, Github, Heart } from "lucide-react";
-import React from "react";
+import { Camera, Github } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export const Header: React.FC = () => {
+  const [swapLink, setSwapLink] = useState("/");
+  const [swapText, setSwapText] = useState("Media Page");
+  useEffect(() => {
+    if (window.location.pathname === "/media") {
+      setSwapLink("/");
+      setSwapText("Scraper Page");
+    } else {
+      setSwapLink("/media");
+      setSwapText("Media Page");
+    }
+  });
+
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,10 +28,15 @@ export const Header: React.FC = () => {
               <p className="text-xs text-gray-500 hidden sm:block">Scrape images and videos from any website</p>
             </div>
           </div>
+          <div>
+            <Link to={swapLink} onClick={() => setSwapLink("")} className="text-sm transition-colors">
+              {swapText}
+            </Link>
+          </div>
 
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com"
+              href="https://github.com/Mio1710/media-scraper"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -29,20 +47,5 @@ export const Header: React.FC = () => {
         </div>
       </div>
     </header>
-  );
-};
-
-export const Footer: React.FC = () => {
-  return (
-    <footer className="bg-white border-t mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
-          <p>
-            Made with <Heart className="h-4 w-4 text-red-500 inline" /> for the Media Scraper project
-          </p>
-          <p>© {new Date().getFullYear()} Media Scraper</p>
-        </div>
-      </div>
-    </footer>
   );
 };

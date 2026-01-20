@@ -9,6 +9,7 @@ export const useScrapeUrls = () => {
   const [error, setError] = useState<Error | null>(null);
   const [isError, setIsError] = useState(false);
 
+  // Custom mutate function to scrape URLs
   const mutateAsync = useCallback(async (urls: string[]): Promise<BulkScrapeResponse> => {
     setIsPending(true);
     setError(null);
