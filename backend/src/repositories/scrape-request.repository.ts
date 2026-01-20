@@ -1,8 +1,9 @@
 import { Transaction } from "sequelize";
-import sequelize from "../config/database";
 import { PaginatedResponse } from "../interfaces/pagination";
+import MediaModel from "../models/Media";
 import ScrapeRequestModel from "../models/ScrapeRequest";
 import { ScrapeJobResult, ScrapeStatus } from "../types/scraper";
+import logger from "../utils/logger";
 
 interface CreateScrapeRequestData {
   readonly sourceUrl: string;
@@ -77,34 +78,42 @@ export class ScrapeRequestRepository {
     pagination: { page: number; limit: number },
     status?: ScrapeStatus,
   ): Promise<PaginatedResponse<ScrapeJobResult>> {
-    const { page, limit } = pagination;
-    const offset = (page - 1) * limit;
-    const whereClause = status ? { status } : {};
-    const { rows, count } = await ScrapeRequestModel.findAndCountAll({
-      attributes: [
-        "id",
-        "sourceUrl",
-        "status",
-        "errorMessage",
-        "createdAt",
-        "updatedAt",
-        [sequelize.fn("COUNT", sequelize.col("Media.id")), "mediaCount"],
-      ],
-      where: whereClause,
-      limit,
-      offset,
-      order: [["createdAt", "DESC"]],
-    });
-    const totalPages = Math.ceil(count / limit);
-    return {
-      data: rows as unknown as ScrapeJobResult[],
-      pagination: {
-        page,
+    try {
+      const { page, limit } = pagination;
+      const offset = (page - 1) * limit;
+      const whereClause = status ? { status } : {};
+      const { rows, count } = await ScrapeRequestModel.findAndCountAll({
+        attributes: ["id", "sourceUrl", "status", "errorMessage", "createdAt", "updatedAt"],
+        where: whereClause,
         limit,
-        totalItems: count,
-        totalPages,
-      },
-    };
+        offset,
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: MediaModel,
+            as: "media",
+          },
+        ],
+      });
+      rows.map((row) => {
+        (row as any).dataValues.mediaCount = (row as any).media ? (row as any).media.length : 0;
+        delete (row as any).dataValues.media;
+      });
+
+      const totalPages = Math.ceil((Array.isArray(count) ? count.length : count) / limit);
+      return {
+        data: rows as unknown as ScrapeJobResult[],
+        pagination: {
+          page,
+          limit,
+          totalItems: Array.isArray(count) ? count.length : count,
+          totalPages,
+        },
+      };
+    } catch (error) {
+      logger.debug("Error in findAllPaginated:", error);
+      throw error;
+    }
   }
 }
 

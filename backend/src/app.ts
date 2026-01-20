@@ -31,6 +31,7 @@ class App {
         origin: config.server.crossOrigin,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
       }),
     );
 

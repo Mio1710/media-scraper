@@ -32,18 +32,15 @@ export interface Pagination {
   limit: number;
   totalItems: number;
   totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
 }
 
 export interface PaginatedResponse<T> {
-  data: T[];
+  data: T;
   pagination: Pagination;
 }
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T> extends PaginatedResponse<T> {
   success: boolean;
-  data?: T;
   error?: string;
   message?: string;
 }

@@ -8,7 +8,7 @@ interface PaginationProps {
 }
 
 export const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange }) => {
-  const { page, totalPages, totalItems, hasNextPage, hasPrevPage } = pagination;
+  const { page, totalPages, totalItems } = pagination;
 
   const handlePrevPage = (): void => {
     onPageChange(page - 1);
@@ -73,7 +73,7 @@ export const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange
         {/* Previous Button */}
         <button
           onClick={handlePrevPage}
-          disabled={!hasPrevPage}
+          disabled={page === 1}
           className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           aria-label="Go to previous page"
         >
@@ -105,7 +105,7 @@ export const Pagination: React.FC<PaginationProps> = ({ pagination, onPageChange
         {/* Next Button */}
         <button
           onClick={handleNextPage}
-          disabled={!hasNextPage}
+          disabled={page >= totalPages}
           className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           aria-label="Go to next page"
         >

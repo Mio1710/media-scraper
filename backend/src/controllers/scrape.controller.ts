@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ApiResponse, PaginatedResponse } from "../interfaces/pagination";
+import { ApiResponse } from "../interfaces/pagination";
 import { scraperService } from "../services";
 import { scrapeQueueService } from "../services/scrape-queue.service";
 import { BulkScrapeResponse, ScrapeJobResult } from "../types/scraper";
@@ -30,7 +30,7 @@ export class ScrapeController {
   // Get /api/scrape
   public async getScrapeHistory(
     _req: Request,
-    res: Response<ApiResponse<PaginatedResponse<ScrapeJobResult>>>,
+    res: Response<ApiResponse<ScrapeJobResult[]>>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -38,9 +38,10 @@ export class ScrapeController {
       const result = await scraperService.fetchScrapeHistory({ page, limit }, status);
       res.json({
         success: true,
-        data: result,
+        ...result,
       });
     } catch (error) {
+      logger.debug("Error fetching scrape history:", error);
       next(error);
     }
   }

@@ -1,24 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import { Media } from "../interfaces";
-import { ApiResponse, PaginatedResponse } from "../interfaces/pagination";
+import { ApiResponse } from "../interfaces/pagination";
 import { mediaService } from "../services/media.service";
 import { MediaFilter, MediaType } from "../types";
 import { MediaQueryInput } from "../utils/validators";
 
 export class MediaController {
   // GET /api/media requests.
-  public async handleGetMedia(
-    _req: Request,
-    res: Response<ApiResponse<PaginatedResponse<Media>>>,
-    next: NextFunction,
-  ): Promise<void> {
+  public async handleGetMedia(_req: Request, res: Response<ApiResponse<Media[]>>, next: NextFunction): Promise<void> {
     try {
       const { page, limit, type, search, sourceUrl } = res.locals.validated as MediaQueryInput;
       const filter = this.buildMediaFilter(type, search, sourceUrl);
       const result = await mediaService.fetchMediaPaginated({ page, limit }, filter);
       res.json({
         success: true,
-        data: result,
+        ...result,
       });
     } catch (error) {
       next(error);

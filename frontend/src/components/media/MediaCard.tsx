@@ -1,6 +1,6 @@
 import { ExternalLink, Image, Trash2, Video, X } from "lucide-react";
 import React, { KeyboardEvent, useState } from "react";
-import { Media, MediaType } from "../types";
+import { Media, MediaType } from "../../types";
 
 interface MediaCardProps {
   readonly media: Media;
@@ -135,7 +135,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ media, onDelete }) => {
         <div className="p-4">
           <h3 className="font-medium text-gray-900 truncate">{media.title || media.alt || "Untitled"}</h3>
           <p className="text-sm text-gray-500 truncate mt-1" title={media.sourceUrl}>
-            From: {new URL(media.sourceUrl).hostname}
+            From: {new URL(media.url).hostname}
           </p>
 
           {(media.width || media.height) && (

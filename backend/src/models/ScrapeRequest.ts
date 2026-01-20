@@ -6,7 +6,7 @@ class ScrapeRequestModel extends Model {
   declare id: string;
   declare sourceUrl: string;
   declare status: ScrapeStatus;
-  declare errorMessage: string | null;
+  declare errorMessage?: string;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
 }

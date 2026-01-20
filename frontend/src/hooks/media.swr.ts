@@ -9,7 +9,7 @@ export const useMediaSWR = (params: MediaQueryParams = {}) => {
     error,
     isLoading,
     mutate: revalidate,
-  } = useSWR<PaginatedResponse<Media>>(["media", params], () => MediaService.getMedia(params), {
+  } = useSWR<PaginatedResponse<Media[]>>(["media", params], () => MediaService.getMedia(params), {
     revalidateOnFocus: false,
     dedupingInterval: 30000,
   });

@@ -1,10 +1,10 @@
 import { AlertCircle, Image as ImageIcon, Loader2, Video } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
-import { useDeleteMedia, useMediaStats, useMediaSWR } from "../hooks/media.swr";
-import { MediaType } from "../types";
+import { useDeleteMedia, useMediaStats, useMediaSWR } from "../../hooks/media.swr";
+import { MediaType } from "../../types";
+import { Pagination } from "../Pagination";
+import { SearchAndFilter } from "../SearchAndFilter";
 import { MediaCard } from "./MediaCard";
-import { Pagination } from "./Pagination";
-import { SearchAndFilter } from "./SearchAndFilter";
 
 export const MediaGallery: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -148,7 +148,7 @@ export const MediaGallery: React.FC = () => {
         )}
 
         {/* Empty State */}
-        {!isLoading && !error && data?.data.length === 0 && (
+        {!isLoading && !error && data?.data?.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-gray-400">
             <ImageIcon className="h-16 w-16 mb-4" />
             <p className="text-lg font-medium">No media found</p>

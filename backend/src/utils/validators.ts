@@ -12,8 +12,7 @@ export const scrapeUrlsSchema = z.object({
     .max(1000, "Maximum 1000 URLs allowed per request"),
 });
 
-// Media query parameters schema
-export const mediaQuerySchema = z.object({
+export const basePaginationSchema = z.object({
   page: z
     .string()
     .optional()
@@ -24,6 +23,11 @@ export const mediaQuerySchema = z.object({
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 20))
     .pipe(z.number().min(1).max(100).default(20)),
+});
+
+// Media query parameters schema
+export const mediaQuerySchema = z.object({
+  ...basePaginationSchema.shape,
   type: z.enum([MediaType.IMAGE, MediaType.VIDEO]).optional(),
   search: z.string().optional(),
   sourceUrl: z.string().optional(),

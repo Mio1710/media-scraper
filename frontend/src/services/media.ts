@@ -1,14 +1,14 @@
 import axiosInstance from "@/utils/axios";
-import { ApiResponse, Media, MediaQueryParams, MediaStats, PaginatedResponse } from "../types";
+import { ApiResponse, Media, MediaQueryParams, MediaStats } from "../types";
 
 export class MediaService {
   // Media endpoints
-  static async getMedia(params: MediaQueryParams = {}): Promise<PaginatedResponse<Media>> {
-    const response = await axiosInstance.get<ApiResponse<PaginatedResponse<Media>>>("/media", { params });
+  static async getMedia(params: MediaQueryParams = {}): Promise<ApiResponse<Media[]>> {
+    const response = await axiosInstance.get<ApiResponse<Media[]>>("/media", { params });
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.message || "Failed to fetch media");
     }
-    return response.data.data;
+    return response.data;
   }
 
   static async getMediaById(id: string): Promise<Media> {
