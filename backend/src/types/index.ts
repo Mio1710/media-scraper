@@ -26,13 +26,7 @@ export interface Media {
   scrapeRequestId: string;
   url: string;
   type: MediaType;
-  sourceUrl: string;
-  title?: string;
   alt?: string;
-  width?: number;
-  height?: number;
-  fileSize?: number;
-  mimeType?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -44,7 +38,6 @@ export interface ScrapeUrlsInput {
 export interface ScrapedMedia {
   url: string;
   type: MediaType;
-  title?: string;
   alt?: string;
   width?: number;
   height?: number;

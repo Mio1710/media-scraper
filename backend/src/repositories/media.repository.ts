@@ -1,29 +1,14 @@
 import { Op, Transaction, WhereOptions } from "sequelize";
+import { CreateMediaDto } from "../models/dto/media.dto";
 import MediaModel from "../models/Media";
 import { Media, MediaFilter, MediaType, PaginatedResponse, PaginationParams } from "../types";
 
-/**
- * Data structure for creating media entries.
- */
-export interface MediaData {
-  readonly scrapeRequestId: string;
-  readonly url: string;
-  readonly type: MediaType;
-  readonly sourceUrl: string;
-  readonly title?: string;
-  readonly alt?: string;
-  readonly width?: number;
-  readonly height?: number;
-  readonly fileSize?: number;
-  readonly mimeType?: string;
-}
-
 export class MediaRepository {
-  public async createMedia(data: MediaData, transaction?: Transaction): Promise<MediaModel> {
+  public async createMedia(data: CreateMediaDto, transaction?: Transaction): Promise<MediaModel> {
     return MediaModel.create(data, { transaction });
   }
 
-  public async createBulkMedia(data: MediaData[], transaction?: Transaction): Promise<MediaModel[]> {
+  public async createBulkMedia(data: CreateMediaDto[], transaction?: Transaction): Promise<MediaModel[]> {
     return MediaModel.bulkCreate(data, {
       transaction,
       ignoreDuplicates: true,
@@ -57,7 +42,7 @@ export class MediaRepository {
     });
     const totalPages = Math.ceil(count / limit);
     return {
-      data: rows.map((row) => row.toJSON() as Media),
+      data: rows.map((row) => row.toJSON() as unknown as Media),
       pagination: {
         page,
         limit,

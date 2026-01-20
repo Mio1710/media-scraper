@@ -1,31 +1,14 @@
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 import { ScrapeStatus } from "../types";
 
-interface ScrapeRequestAttributes {
-  id: string;
-  sourceUrl: string;
-  status: ScrapeStatus;
-  errorMessage: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface ScrapeRequestCreationAttributes extends Optional<
-  ScrapeRequestAttributes,
-  "id" | "errorMessage" | "createdAt" | "updatedAt"
-> {}
-
-class ScrapeRequestModel
-  extends Model<ScrapeRequestAttributes, ScrapeRequestCreationAttributes>
-  implements ScrapeRequestAttributes
-{
-  public id!: string;
-  public sourceUrl!: string;
-  public status!: ScrapeStatus;
-  public errorMessage!: string | null;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+class ScrapeRequestModel extends Model {
+  declare id: string;
+  declare sourceUrl: string;
+  declare status: ScrapeStatus;
+  declare errorMessage: string | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 ScrapeRequestModel.init(
@@ -70,9 +53,6 @@ ScrapeRequestModel.init(
       },
       {
         fields: ["source_url"],
-      },
-      {
-        fields: ["created_at"],
       },
     ],
   },

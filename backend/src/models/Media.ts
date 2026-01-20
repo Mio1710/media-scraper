@@ -1,43 +1,17 @@
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 import { MediaType } from "../types";
+import { CreateMediaAttr } from "../types/media";
 import ScrapeRequestModel from "./ScrapeRequest";
 
-interface MediaAttributes {
-  id: string;
-  scrapeRequestId: string;
-  url: string;
-  type: MediaType;
-  sourceUrl: string;
-  title: string | null;
-  alt: string | null;
-  width: number | null;
-  height: number | null;
-  fileSize: number | null;
-  mimeType: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface MediaCreationAttributes extends Optional<
-  MediaAttributes,
-  "id" | "title" | "alt" | "width" | "height" | "fileSize" | "mimeType" | "createdAt" | "updatedAt"
-> {}
-
-class MediaModel extends Model<MediaAttributes, MediaCreationAttributes> implements MediaAttributes {
-  public id!: string;
-  public scrapeRequestId!: string;
-  public url!: string;
-  public type!: MediaType;
-  public sourceUrl!: string;
-  public title!: string | null;
-  public alt!: string | null;
-  public width!: number | null;
-  public height!: number | null;
-  public fileSize!: number | null;
-  public mimeType!: string | null;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+class MediaModel extends Model<CreateMediaAttr> {
+  declare id: string;
+  declare scrapeRequestId: string;
+  declare url: string;
+  declare type: MediaType;
+  declare alt: string | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 MediaModel.init(
@@ -64,36 +38,9 @@ MediaModel.init(
       type: DataTypes.ENUM(...Object.values(MediaType)),
       allowNull: false,
     },
-    sourceUrl: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      field: "source_url",
-    },
-    title: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-    },
     alt: {
-      type: DataTypes.STRING(1000),
+      type: DataTypes.TEXT,
       allowNull: true,
-    },
-    width: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    height: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    fileSize: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      field: "file_size",
-    },
-    mimeType: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-      field: "mime_type",
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -114,17 +61,11 @@ MediaModel.init(
         fields: ["type"],
       },
       {
-        fields: ["source_url"],
-      },
-      {
         fields: ["scrape_request_id"],
       },
       {
-        fields: ["created_at"],
-      },
-      {
         type: "FULLTEXT",
-        fields: ["title", "alt"],
+        fields: ["alt"],
         name: "media_fulltext_idx",
       },
     ],

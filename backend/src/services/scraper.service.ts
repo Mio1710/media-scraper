@@ -103,9 +103,6 @@ export class ScraperService {
           url: resolvedUrl,
           type: MediaType.IMAGE,
           alt: alt?.substring(0, MAX_ALT_LENGTH),
-          title: title?.substring(0, MAX_TITLE_LENGTH),
-          width: this.parseWidthHeight(width),
-          height: this.parseWidthHeight(height),
         });
       });
     });
@@ -156,9 +153,6 @@ export class ScraperService {
           media.push({
             url: resolvedUrl,
             type: MediaType.VIDEO,
-            title: title?.substring(0, MAX_TITLE_LENGTH),
-            width: this.parseWidthHeight(width),
-            height: this.parseWidthHeight(height),
           });
         }
       }
@@ -170,7 +164,6 @@ export class ScraperService {
           media.push({
             url: resolvedPoster,
             type: MediaType.IMAGE,
-            title: `Video poster: ${title ?? "Unknown"}`,
           });
         }
       }
@@ -186,7 +179,6 @@ export class ScraperService {
           media.push({
             url: resolvedUrl,
             type: MediaType.VIDEO,
-            title: title?.substring(0, MAX_TITLE_LENGTH),
           });
         });
     });
@@ -214,7 +206,6 @@ export class ScraperService {
       media.push({
         url: resolvedUrl,
         type: MediaType.VIDEO,
-        title: $(element).attr("title")?.substring(0, MAX_TITLE_LENGTH),
       });
     });
   }
@@ -263,7 +254,7 @@ export class ScraperService {
       const resolvedUrl = this.resolveUrl(baseUrl, content);
       if (!resolvedUrl || seenUrls.has(resolvedUrl)) return;
       seenUrls.add(resolvedUrl);
-      media.push({ url: resolvedUrl, type: MediaType.IMAGE, title: ogTitle });
+      media.push({ url: resolvedUrl, type: MediaType.IMAGE });
     });
 
     $('meta[property="og:video"]').each((_: number, element: Element) => {
@@ -272,7 +263,7 @@ export class ScraperService {
       const resolvedUrl = this.resolveUrl(baseUrl, content);
       if (!resolvedUrl || seenUrls.has(resolvedUrl)) return;
       seenUrls.add(resolvedUrl);
-      media.push({ url: resolvedUrl, type: MediaType.VIDEO, title: ogTitle });
+      media.push({ url: resolvedUrl, type: MediaType.VIDEO });
     });
   }
 
