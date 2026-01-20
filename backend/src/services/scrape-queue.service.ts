@@ -1,7 +1,7 @@
 import pLimit from "p-limit";
 import { config } from "../config";
 import sequelize from "../config/database";
-import { CreateMediaDto } from "../models/dto/media.dto";
+import { ICreateMedia } from "../interfaces";
 import { mediaRepository, scrapeRequestRepository } from "../repositories";
 import { BulkScrapeResponse, ScrapedMedia, ScrapeJobResult, ScrapeStatus } from "../types";
 import { logger } from "../utils/logger";
@@ -117,7 +117,7 @@ export class ScrapeQueueService {
       return 0;
     }
 
-    const mediaData: CreateMediaDto[] = media.map((m) => ({
+    const mediaData: ICreateMedia[] = media.map((m) => ({
       scrapeRequestId,
       url: m.url,
       type: m.type,

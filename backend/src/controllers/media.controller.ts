@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { Media } from "../interfaces";
 import { mediaService } from "../services/media.service";
-import { ApiResponse, Media, MediaFilter, MediaType, PaginatedResponse } from "../types";
+import { ApiResponse, MediaFilter, MediaType, PaginatedResponse } from "../types";
 import { MediaQueryInput } from "../utils/validators";
 
 export class MediaController {

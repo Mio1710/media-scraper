@@ -12,25 +12,6 @@ export enum ScrapeStatus {
   FAILED = "failed",
 }
 
-export interface ScrapeRequest {
-  id: string;
-  sourceUrl: string;
-  status: ScrapeStatus;
-  errorMessage?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Media {
-  id: string;
-  scrapeRequestId: string;
-  url: string;
-  type: MediaType;
-  alt?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface ScrapeUrlsInput {
   urls: string[];
 }
