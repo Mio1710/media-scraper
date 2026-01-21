@@ -12,7 +12,7 @@ Media Scraper is a full-stack web application which is used to scrape images and
 
 - **Bulk Scraping:** Input multiple URLs to scrape images and videos in parallel.
 - **Media Gallery:** Browse, search, filter, and paginate all scraped media.
-- **Robust Backend:** Express API with rate limiting, validation, and error handling.
+- **Robust Backend:** Use Bullmq vs Worker to deal with a huge number of requests
 - **Persistence:** Uses PostgreSQL for storage and Redis for queue management.
 - **Dockerized:** Easy deployment with Docker Compose and Nginx reverse proxy.
 

@@ -1,5 +1,3 @@
-import pLimit from "p-limit";
-import { config } from "../config";
 import { ICreateMedia } from "../interfaces";
 import { mediaRepository, scrapeRequestRepository } from "../repositories";
 import { BulkScrapeResponse, ScrapedMedia, ScrapeJobResult, ScrapeStatus } from "../types/scraper";
@@ -14,36 +12,17 @@ interface QueuedJob {
 const CHUNK_SIZE = 100;
 
 export class ScrapeQueueService {
-  private readonly concurrencyLimit: number;
-  private readonly maxRetries: number;
-
-  constructor() {
-    this.concurrencyLimit = config.scraper.maxConcurrentScrapes;
-    this.maxRetries = config.scraper.maxRetries;
-  }
-
   public async processBulkScrape(urls: string[]): Promise<BulkScrapeResponse> {
     const results: ScrapeJobResult[] = [];
-    const limit = pLimit(this.concurrencyLimit);
 
     try {
       const scrapeRequests = await scrapeRequestRepository.createBulkRequests(urls);
-
       const jobs: QueuedJob[] = scrapeRequests.map((scrap) => ({
         id: scrap.id,
         url: scrap.sourceUrl,
         retries: 0,
       }));
-
-      const jobPromises = jobs.map((job) =>
-        limit(async () => {
-          const result = await this.processJob(job);
-          results.push(result);
-          return result;
-        }),
-      );
-
-      await Promise.all(jobPromises);
+      jobs.map((job) => this.processJob(job));
       return { totalRequests: urls.length, results };
     } catch (error) {
       throw error;

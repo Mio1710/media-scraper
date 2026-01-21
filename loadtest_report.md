@@ -6,6 +6,7 @@ This report summarizes the results of a load test performed on the Media Scraper
 
 ## Test Configuration
 
+- **Tool:** autocannon
 - **Target URL:** `http://localhost:3001/api/scrape`
 - **Concurrent Connections:** 500
 - **Duration:** 30 seconds
