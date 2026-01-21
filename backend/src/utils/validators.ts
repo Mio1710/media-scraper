@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MediaType } from "../types";
+import { ScrapeStatus } from "../types/scraper";
 
 // URL validation regex
 const urlRegex = /^https?:\/\/.+/i;
@@ -33,6 +34,12 @@ export const mediaQuerySchema = z.object({
   sourceUrl: z.string().optional(),
 });
 
+export const scraperQuerySchema = z.object({
+  ...basePaginationSchema.shape,
+  status: z
+    .enum([ScrapeStatus.COMPLETED, ScrapeStatus.PENDING, ScrapeStatus.PROCESSING, ScrapeStatus.FAILED])
+    .optional(),
+});
 // Single URL validation schema
 export const urlSchema = z.object({
   url: z.string().regex(urlRegex, "Invalid URL format"),

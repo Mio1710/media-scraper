@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { scrapeController } from "../controllers";
 import { validateBody, validateParams, validateQuery } from "../middlewares";
-import { basePaginationSchema, idParamSchema, scrapeUrlsSchema } from "../utils/validators";
+import { idParamSchema, scraperQuerySchema, scrapeUrlsSchema } from "../utils/validators";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ const router = Router();
  */
 router.post("/", validateBody(scrapeUrlsSchema), (req, res, next) => scrapeController.handleScrapeUrls(req, res, next));
 
-router.get("/", validateQuery(basePaginationSchema), (req, res, next) =>
+router.get("/", validateQuery(scraperQuerySchema), (req, res, next) =>
   scrapeController.getScrapeHistory(req, res, next),
 );
 /**
