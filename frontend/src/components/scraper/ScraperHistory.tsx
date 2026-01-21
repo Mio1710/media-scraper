@@ -1,7 +1,7 @@
 import { useScrapeHistory } from "@/hooks/scraper.swr";
 import { ScrapeStatus } from "@/types";
 
-import { AlertCircle, ImageIcon, Loader2 } from "lucide-react";
+import { AlertCircle, ImageIcon, Loader2, X } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
 import Pagination from "../Pagination";
 
@@ -15,34 +15,18 @@ const STATUS_OPTIONS = [
 
 const ScraperHistory: React.FC = () => {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<ScrapeStatus | "">("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const limit = 20;
 
-  // Debounce search
-  const debounceTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleSearchChange = useCallback((value: string): void => {
-    setSearch(value);
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-    debounceTimeout.current = setTimeout(() => {
-      setDebouncedSearch(value);
-      setPage(1);
-    }, 300);
-  }, []);
-
   const handleTypeFilterChange = useCallback((value: ScrapeStatus | ""): void => {
+    console.log("Selected: ", value);
+
     setTypeFilter(value);
     setPage(1);
   }, []);
 
   const handleClearFilters = useCallback((): void => {
-    setSearch("");
-    setDebouncedSearch("");
     setTypeFilter("");
     setPage(1);
   }, []);
@@ -55,27 +39,46 @@ const ScraperHistory: React.FC = () => {
     () => ({
       page,
       limit,
-      type: typeFilter || undefined,
-      search: debouncedSearch || undefined,
+      status: typeFilter || undefined,
     }),
-    [page, typeFilter, debouncedSearch],
+    [page, typeFilter],
   );
 
-  const { data, isLoading, error, refetch } = useScrapeHistory(queryParams);
+  const { data, pagination, isLoading, error, refetch } = useScrapeHistory(queryParams);
   const handleRetry = (): void => {
     refetch();
   };
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      {/* <SearchAndFilter
-        search={search}
-        onSearchChange={handleSearchChange}
-        typeFilter={typeFilter}
-        onTypeFilterChange={handleTypeFilterChange}
-        onClear={handleClearFilters}
-      /> */}
+    <div>
+      <div className="flex flex-row-reverse my-2">
+        <div className="flex gap-2">
+          <select
+            value={typeFilter}
+            onChange={(e) => handleTypeFilterChange(e.target.value as ScrapeStatus | "")}
+            className="block p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm bg-white"
+            aria-label="Filter by media type"
+          >
+            <option value="">All Types</option>
+            {Object.values(ScrapeStatus).map((status) => (
+              <option key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
+              </option>
+            ))}
+          </select>
 
-      {/* Loading State */}
+          {/* Clear Filters */}
+          {typeFilter && (
+            <button
+              onClick={handleClearFilters}
+              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              aria-label="Clear all filters"
+            >
+              <X className="h-4 w-4" />
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
       {isLoading && (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
@@ -100,28 +103,34 @@ const ScraperHistory: React.FC = () => {
       )}
 
       {/* Empty State */}
-      {!isLoading && !error && data?.data?.length === 0 && (
+      {!isLoading && !error && data?.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-gray-400">
           <ImageIcon className="h-16 w-16 mb-4" />
           <p className="text-lg font-medium">No media found</p>
-          <p className="text-sm">
-            {debouncedSearch || typeFilter ? "Try adjusting your filters" : "Start by scraping some URLs"}
-          </p>
+          <p className="text-sm">{typeFilter ? "Try adjusting your filters" : "Start by scraping some URLs"}</p>
         </div>
       )}
 
       {/* Media Grid */}
-      {!isLoading && !error && data && data.data.length > 0 && (
+      {!isLoading && !error && data && data.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {data.data.map((media) => (
-              <>{media.sourceUrl}</>
+          <div className="flex flex-col gap-4">
+            {data.map((media, index) => (
+              <div key={index} className="bg-white rounded-lg shadow p-4">
+                <div className="flex justify-between">
+                  <div>Source url: {media.sourceUrl}</div>
+                  <div>{media.status}</div>
+                </div>
+                <div>Media Count: {media.mediaCount}</div>
+                {media.errorMessage && <div className="text-red-500">Error: {media.errorMessage}</div>}
+                <div>Started at: {media.updatedAt}</div>
+              </div>
               // <MediaCard key={media.id} media={media} onDelete={handleDelete} />
             ))}
           </div>
 
           {/* Pagination */}
-          <Pagination pagination={data.pagination} onPageChange={handlePageChange} />
+          {pagination && <Pagination pagination={pagination} onPageChange={handlePageChange} />}
         </>
       )}
     </div>

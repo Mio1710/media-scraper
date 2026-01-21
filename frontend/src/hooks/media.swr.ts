@@ -1,7 +1,15 @@
 import { MediaService } from "@/services/media";
-import { Media, MediaQueryParams, PaginatedResponse } from "@/types";
+import { Media, MediaType, PaginatedResponse } from "@/types";
 import { useCallback, useState } from "react";
 import useSWR, { mutate } from "swr";
+// Query Parameters
+export interface MediaQueryParams {
+  page?: number;
+  limit?: number;
+  type?: MediaType;
+  search?: string;
+  sourceUrl?: string;
+}
 
 export const useMediaSWR = (params: MediaQueryParams = {}) => {
   const {

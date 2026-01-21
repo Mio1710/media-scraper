@@ -3,7 +3,11 @@ import { BulkScrapeResponse } from "@/types";
 import { useCallback, useState } from "react";
 import useSWR from "swr";
 import { mutate } from "swr/_internal";
-
+export interface ScrapeHistoryParams {
+  page: number;
+  limit: number;
+  status?: string;
+}
 export const useScrapeUrls = () => {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -44,7 +48,9 @@ export const useScrapeStatus = (id: string | null) => {
   return { data, error, isLoading };
 };
 
-export const useScrapeHistory = ({ page, limit, status }: { page: number; limit: number; status?: string }) => {
+export const useScrapeHistory = ({ page, limit, status }: ScrapeHistoryParams) => {
+  console.log("Change params: ", status);
+
   const {
     data,
     error,
@@ -53,5 +59,5 @@ export const useScrapeHistory = ({ page, limit, status }: { page: number; limit:
   } = useSWR(["scrapeHistory", page, limit, status], () => ScraperService.getScrapeHistory(page, limit, status), {
     revalidateOnFocus: false,
   });
-  return { data, error, isLoading, refetch: revalidate };
+  return { data: data?.data ?? [], pagination: data?.pagination, error, isLoading, refetch: revalidate };
 };

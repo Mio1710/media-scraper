@@ -51,6 +51,7 @@ export interface ScrapeJobResult {
   status: ScrapeStatus;
   mediaCount: number;
   errorMessage?: string;
+  updatedAt?: string;
 }
 
 export interface BulkScrapeResponse {
@@ -61,13 +62,4 @@ export interface BulkScrapeResponse {
 export interface MediaStats {
   type: MediaType;
   count: number;
-}
-
-// Query Parameters
-export interface MediaQueryParams {
-  page?: number;
-  limit?: number;
-  type?: MediaType;
-  search?: string;
-  sourceUrl?: string;
 }
