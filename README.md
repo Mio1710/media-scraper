@@ -32,7 +32,7 @@ Media Scraper is a full-stack web application which is used to scrape images and
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) >= v22
-- [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
+- [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/): Docker version 27.4.0
 
 ### Backend:
 
