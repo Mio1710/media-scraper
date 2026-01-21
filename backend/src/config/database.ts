@@ -12,7 +12,7 @@ const sequelize = new Sequelize({
   pool: config.database.pool,
   ssl: true,
   //   clientMinMessages: "notice",
-  logging: config.database.logging ? (msg) => logger.debug(msg) : false,
+  logging: config.database.logging ? (msg) => logger.info(msg) : false,
   define: {
     timestamps: true,
     underscored: true,
@@ -21,7 +21,8 @@ const sequelize = new Sequelize({
 
 export const connectDatabase = async (): Promise<void> => {
   try {
-    logger.info("Connecting to the database...");
+    logger.info("Connecting to the database...", config.database);
+    logger.info(JSON.stringify(config.database));
     await sequelize.authenticate();
 
     logger.info("Database connection established successfully");

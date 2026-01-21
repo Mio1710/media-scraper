@@ -112,7 +112,7 @@ export class ScrapeRequestRepository {
         },
       };
     } catch (error) {
-      logger.debug("Error in findAllPaginated:", error);
+      logger.error("Error in findAllPaginated:", error);
       throw error;
     }
   }

@@ -49,7 +49,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: ${PROJECT}-backend
-    restart: unless-stopped
+    # restart: unless-stopped
     env_file:
       - ./backend/.env
     ports:
@@ -76,12 +76,11 @@ services:
       dockerfile: Dockerfile
     container_name: ${PROJECT}-frontend
     restart: unless-stopped
+    env_file:
+      - ./frontend/.env
     ports:
-      - "5173:80"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/dist
+      # - "5173:5173"
+      - "80:3000"
     depends_on:
       - backend
     networks:
@@ -91,16 +90,18 @@ services:
         limits:
           cpus: "0.2"
           memory: 200M
-  nginx:
-    container_name: ${PROJECT}-nginx
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - frontend
-      - backend
+  # nginx:
+  #   container_name: ${PROJECT}-nginx
+  #   build:
+  #     context: ./nginx
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   networks:
+  #     - ${PROJECT}-network
 
 volumes:
   postgres_data:

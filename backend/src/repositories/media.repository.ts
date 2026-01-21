@@ -86,7 +86,6 @@ export class MediaRepository {
     }
     if (filter.search) {
       whereClause[Op.or as unknown as string] = [
-        { title: { [Op.like]: `%${filter.search}%` } },
         { alt: { [Op.like]: `%${filter.search}%` } },
         { url: { [Op.like]: `%${filter.search}%` } },
       ];

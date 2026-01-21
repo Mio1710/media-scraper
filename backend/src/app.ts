@@ -1,9 +1,10 @@
+import compression from "compression";
 import cors from "cors";
 import express, { Express, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import { config } from "./config";
 import { connectDatabase } from "./config/database";
-import { apiRateLimiter, errorHandler, notFoundHandler } from "./middlewares";
+import { errorHandler, notFoundHandler } from "./middlewares";
 import routes from "./routes";
 import { logger } from "./utils/logger";
 
@@ -36,14 +37,14 @@ class App {
     );
 
     // Compression
-    // this.app.use(compression());
+    this.app.use(compression());
 
     // Body parsing
     this.app.use(express.json({ limit: "10mb" }));
     this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
     // Rate limiting
-    this.app.use("/api/", apiRateLimiter);
+    // this.app.use("/api/", apiRateLimiter);
 
     // Request logging
     this.app.use((req: Request, res: Response, next: NextFunction) => {

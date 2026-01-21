@@ -41,7 +41,7 @@ export class ScrapeController {
         ...result,
       });
     } catch (error) {
-      logger.debug("Error fetching scrape history:", error);
+      logger.error("Error fetching scrape history:", error);
       next(error);
     }
   }

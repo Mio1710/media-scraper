@@ -1,4 +1,4 @@
-import { ScrapeStatus } from "../types";
+import { ScrapeStatus } from "../types/scraper";
 
 export interface ScrapeRequest {
   id: string;

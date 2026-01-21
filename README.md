@@ -63,7 +63,8 @@ Media Scraper is a full-stack web application which is used to scrape images and
 3. **Start all services with Docker Compose:**
 
    ```sh
-   docker-compose up --build
+   docker-compose build --no-cache
+   docker-compose up -d
    ```
 
 4. **Access the app:**
