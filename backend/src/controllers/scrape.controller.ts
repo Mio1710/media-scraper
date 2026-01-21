@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiResponse } from "../interfaces/pagination";
+import { requestQueue } from "../queue/bullmq";
 import { scraperService } from "../services";
 import { scrapeQueueService } from "../services/scrape-queue.service";
 import { BulkScrapeResponse, ScrapeJobResult } from "../types/scraper";
@@ -15,11 +16,10 @@ export class ScrapeController {
   ): Promise<void> {
     try {
       const { urls } = res.locals.validated as ScrapeUrlsInput;
-      logger.info(`Received scrape request for ${urls.length} URLs`);
-      const result = await scrapeQueueService.processBulkScrape(urls);
+      requestQueue.add("bulkScrape", urls ?? []);
+      logger.info(`Received scrape request add ${urls.length} URLs`);
       res.status(202).json({
         success: true,
-        data: result,
         message: `Processing ${urls.length} URLs`,
       });
     } catch (error) {

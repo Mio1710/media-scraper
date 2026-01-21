@@ -18,11 +18,20 @@ Media Scraper is a full-stack web application which is used to scrape images and
 
 ---
 
+## Resource
+
+**Total: 1CPU, 1 GB**
+
+- postgres: 10%
+- redis: 10 % (for bullmq)
+- frontend: 10%
+- backend: 70%
+
 ## Tech Stack
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) >= v24
+- [Node.js](https://nodejs.org/) >= v22
 - [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 
 ### Backend:

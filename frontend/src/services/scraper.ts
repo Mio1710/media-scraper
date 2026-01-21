@@ -3,19 +3,19 @@ import axiosInstance from "@/utils/axios";
 
 export class ScraperService {
   static async scrapeUrls(urls: string[]): Promise<BulkScrapeResponse> {
-    const response = await axiosInstance.post<ApiResponse<BulkScrapeResponse>>("/scrape", { urls });
-    if (!response.data.success || !response.data.data) {
+    const response = await axiosInstance.post<BulkScrapeResponse>("/scrape", { urls });
+    if (!response.data.success || !response.data.message) {
       throw new Error(response.data.message || "Failed to initiate scraping");
     }
-    return response.data.data;
+    return response.data;
   }
 
-  static async getScrapeStatus(id: string): Promise<ScrapeJobResult> {
-    const response = await axiosInstance.get<ApiResponse<ScrapeJobResult>>(`/scrape/${id}`);
+  static async getScrapeStatus(id: string): Promise<string> {
+    const response = await axiosInstance.get<ApiResponse<string>>(`/scrape/${id}`);
     if (!response.data.success || !response.data.data) {
       throw new Error(response.data.message || "Failed to get scrape status");
     }
-    return response.data.data;
+    return response.data.message ?? "";
   }
 
   static async getScrapeHistory(page: number, limit: number, status?: string): Promise<ApiResponse<ScrapeJobResult[]>> {

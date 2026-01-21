@@ -1,7 +1,7 @@
 import { useScrapeUrls } from "@/hooks/scraper.swr";
 import { CheckCircle, Link as LinkIcon, Loader2, Plus, X, XCircle } from "lucide-react";
 import React, { useCallback, useState } from "react";
-import { ScrapeJobResult, ScrapeStatus } from "../../types";
+import { ScrapeStatus } from "../../types";
 
 interface UrlInput {
   readonly id: number;
@@ -10,8 +10,7 @@ interface UrlInput {
 const MAX_URL_INPUTS = 10;
 export const ScrapeForm: React.FC = () => {
   const [urls, setUrls] = useState<UrlInput[]>([{ id: 1, value: "" }]);
-  const [results, setResults] = useState<ScrapeJobResult[]>([]);
-  const [showResults, setShowResults] = useState(false);
+  const [showResults, setShowResults] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const scrapeUrls = useScrapeUrls();
@@ -49,15 +48,14 @@ export const ScrapeForm: React.FC = () => {
 
     try {
       const response = await scrapeUrls.mutateAsync(validUrls);
-      setResults(response.results);
-      setShowResults(true);
+      setShowResults(response.message);
     } catch (error) {
       console.error("Scraping failed:", error);
     }
   };
 
   const handleHideResults = (): void => {
-    setShowResults(false);
+    setShowResults("");
   };
 
   const getStatusIcon = (status: ScrapeStatus): React.ReactNode => {
@@ -148,7 +146,7 @@ export const ScrapeForm: React.FC = () => {
       )}
 
       {/* Results */}
-      {showResults && results.length > 0 && (
+      {showResults && (
         <div className="mt-6 border-t pt-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-medium text-gray-900">Scraping Results</h3>
@@ -162,26 +160,11 @@ export const ScrapeForm: React.FC = () => {
           </div>
 
           <div className="space-y-2 max-h-64 overflow-y-auto">
-            {results.map((result) => (
-              <div key={result.requestId} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                {getStatusIcon(result.status)}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{result.sourceUrl}</p>
-                  <p className="text-xs text-gray-500">
-                    {result.status === ScrapeStatus.COMPLETED
-                      ? `Found ${result.mediaCount} media items`
-                      : result.status === ScrapeStatus.FAILED
-                        ? result.errorMessage
-                        : "Processing..."}
-                  </p>
-                </div>
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500">{showResults}</p>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-3 text-sm text-gray-500">
-            Total: {results.length} URLs processed | {results.filter((r) => r.status === ScrapeStatus.COMPLETED).length}{" "}
-            successful | {results.reduce((sum, r) => sum + r.mediaCount, 0)} media items found
+            </div>
           </div>
         </div>
       )}

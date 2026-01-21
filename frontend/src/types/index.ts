@@ -55,8 +55,8 @@ export interface ScrapeJobResult {
 }
 
 export interface BulkScrapeResponse {
-  totalRequests: number;
-  results: ScrapeJobResult[];
+  message: string;
+  success: boolean;
 }
 
 export interface MediaStats {

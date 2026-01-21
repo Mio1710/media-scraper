@@ -4,7 +4,7 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import helmet from "helmet";
 import { config } from "./config";
 import { connectDatabase } from "./config/database";
-import { errorHandler, notFoundHandler } from "./middlewares";
+import { apiRateLimiter, errorHandler, notFoundHandler } from "./middlewares";
 import routes from "./routes";
 import { logger } from "./utils/logger";
 
@@ -44,7 +44,7 @@ class App {
     this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
     // Rate limiting
-    // this.app.use("/api/", apiRateLimiter);
+    this.app.use("/api/", apiRateLimiter);
 
     // Request logging
     this.app.use((req: Request, res: Response, next: NextFunction) => {

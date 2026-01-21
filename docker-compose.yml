@@ -18,8 +18,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.3"
-          memory: 300M
+          cpus: "0.1"
+          memory: 100M
 
   # Redis for caching and queue
   redis:
@@ -66,8 +66,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.4"
-          memory: 400M
+          cpus: "0.7"
+          memory: 700M
 
   # Frontend
   frontend:
@@ -88,8 +88,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 200M
+          cpus: "0.1"
+          memory: 100M
   # nginx:
   #   container_name: ${PROJECT}-nginx
   #   build:

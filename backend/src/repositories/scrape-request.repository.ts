@@ -21,14 +21,18 @@ export class ScrapeRequestRepository {
     );
   }
 
-  public async createBulkRequests(data: string[], transaction: Transaction): Promise<ScrapeRequestModel[]> {
-    return ScrapeRequestModel.bulkCreate(
-      data.map((sourceUrl) => ({
-        sourceUrl,
-        status: ScrapeStatus.PENDING,
-      })),
-      { transaction },
-    );
+  public async createBulkRequests(data: string[]): Promise<ScrapeRequestModel[]> {
+    try {
+      return ScrapeRequestModel.bulkCreate(
+        data?.map((sourceUrl) => ({
+          sourceUrl,
+          status: ScrapeStatus.PENDING,
+        })),
+      );
+    } catch (error) {
+      logger.error("Error in createBulkRequests:", data);
+      throw error;
+    }
   }
 
   public async findById(id: string): Promise<ScrapeRequestModel | null> {

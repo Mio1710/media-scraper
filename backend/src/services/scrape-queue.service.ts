@@ -1,6 +1,5 @@
 import pLimit from "p-limit";
 import { config } from "../config";
-import sequelize from "../config/database";
 import { ICreateMedia } from "../interfaces";
 import { mediaRepository, scrapeRequestRepository } from "../repositories";
 import { BulkScrapeResponse, ScrapedMedia, ScrapeJobResult, ScrapeStatus } from "../types/scraper";
@@ -10,7 +9,6 @@ import { scraperService } from "./scraper.service";
 interface QueuedJob {
   readonly id: string;
   readonly url: string;
-  readonly retries: number;
 }
 
 const CHUNK_SIZE = 100;
@@ -27,11 +25,9 @@ export class ScrapeQueueService {
   public async processBulkScrape(urls: string[]): Promise<BulkScrapeResponse> {
     const results: ScrapeJobResult[] = [];
     const limit = pLimit(this.concurrencyLimit);
-    const transaction = await sequelize.transaction();
 
     try {
-      const scrapeRequests = await scrapeRequestRepository.createBulkRequests(urls, transaction);
-      await transaction.commit();
+      const scrapeRequests = await scrapeRequestRepository.createBulkRequests(urls);
 
       const jobs: QueuedJob[] = scrapeRequests.map((scrap) => ({
         id: scrap.id,
@@ -48,10 +44,8 @@ export class ScrapeQueueService {
       );
 
       await Promise.all(jobPromises);
-
       return { totalRequests: urls.length, results };
     } catch (error) {
-      await transaction.rollback();
       throw error;
     }
   }
@@ -93,12 +87,6 @@ export class ScrapeQueueService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      if (job.retries < this.maxRetries) {
-        logger.warn(`Retrying job ${id} (attempt ${job.retries + 1}/${this.maxRetries}): ${errorMessage}`);
-        return this.processJob({ ...job, retries: job.retries + 1 });
-      }
-
       await scrapeRequestRepository.updateStatus(id, ScrapeStatus.FAILED, errorMessage);
       logger.error(`Failed scrape job ${id}: ${errorMessage}`);
 

@@ -45,11 +45,12 @@ interface LoadTestResult {
 }
 
 const testUrls = [
-  "https://example.com",
-  "https://httpbin.org/html",
+  "https://tuoitre.vn/du-lich.htm",
+  "https://vnexpress.net/giai-tri",
   "https://www.wikipedia.org",
-  "https://jsonplaceholder.typicode.com",
-  "https://httpstat.us/200",
+  "https://baomoi.com/chu-de.epi",
+  "https://vnexpress.net/suc-khoe",
+  "https://baomoi.com/tin-video.epi",
 ];
 
 const generateUrlBatch = (batchSize: number): string[] => {
@@ -157,15 +158,18 @@ const printResults = (result: LoadTestResult): void => {
   console.log("\n" + "=".repeat(60));
 
   // Performance assessment
-  const successRate = (
-    ((result.requests.total - result.errors - result.timeouts) / result.requests.total) *
-    100
-  ).toFixed(2);
-  console.log(`\n✅ Success Rate: ${successRate}%`);
+  let successRate = 0;
+  if (result.requests.total > 0) {
+    successRate = Math.max(
+      0,
+      Math.min(100, ((result.requests.total - result.errors - result.timeouts) / result.requests.total) * 100),
+    );
+  }
+  console.log(`\n✅ Success Rate: ${successRate.toFixed(2)}%`);
 
-  if (result.latency.p99 < 1000 && parseFloat(successRate) > 95) {
+  if (result.latency.p99 < 1000 && successRate > 95) {
     console.log("🎉 PASSED: System can handle the load efficiently!");
-  } else if (parseFloat(successRate) > 90) {
+  } else if (successRate > 90) {
     console.log("⚠️  WARNING: System is under stress but handling requests");
   } else {
     console.log("❌ FAILED: System cannot handle the load");
@@ -185,9 +189,9 @@ const main = async (): Promise<void> => {
   // Test configuration optimized for limited resources
   const testConfig: LoadTestConfig = {
     url: `${baseUrl}/api/scrape`,
-    connections: 500, // 500 concurrent connections
+    connections: 50, // 50 concurrent connections
     duration: 30, // 30 seconds
-    pipelining: 10, // 10 requests per connection = ~5000 concurrent
+    pipelining: 100, // 10 requests per connection = ~5000 concurrent
     workers: 4, // Use multiple workers
   };
 
