@@ -5,40 +5,19 @@ import { AlertCircle, ImageIcon, Loader2, X } from "lucide-react";
 import React, { useCallback, useMemo, useState } from "react";
 import Pagination from "../Pagination";
 
-const STATUS_OPTIONS = [
-  { value: "", label: "All" },
-  { value: "pending", label: "Pending" },
-  { value: "processing", label: "Processing" },
-  { value: "completed", label: "Completed" },
-  { value: "failed", label: "Failed" },
-];
-
 const ScraperHistory: React.FC = () => {
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState<ScrapeStatus | "">("");
 
-  const limit = 20;
-
   const handleTypeFilterChange = useCallback((value: ScrapeStatus | ""): void => {
-    console.log("Selected: ", value);
-
     setTypeFilter(value);
     setPage(1);
-  }, []);
-
-  const handleClearFilters = useCallback((): void => {
-    setTypeFilter("");
-    setPage(1);
-  }, []);
-
-  const handlePageChange = useCallback((newPage: number): void => {
-    setPage(newPage);
   }, []);
 
   const queryParams = useMemo(
     () => ({
       page,
-      limit,
+      limit: 10,
       status: typeFilter || undefined,
     }),
     [page, typeFilter],
@@ -69,7 +48,9 @@ const ScraperHistory: React.FC = () => {
           {/* Clear Filters */}
           {typeFilter && (
             <button
-              onClick={handleClearFilters}
+              onClick={() => {
+                handleTypeFilterChange("");
+              }}
               className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="Clear all filters"
             >
@@ -130,7 +111,7 @@ const ScraperHistory: React.FC = () => {
           </div>
 
           {/* Pagination */}
-          {pagination && <Pagination pagination={pagination} onPageChange={handlePageChange} />}
+          {pagination && <Pagination pagination={pagination} onPageChange={(newPage) => setPage(newPage)} />}
         </>
       )}
     </div>

@@ -1,4 +1,3 @@
-import { config } from "../config";
 import { Media } from "../interfaces";
 import { PaginatedResponse, PaginationParams } from "../interfaces/pagination";
 import { mediaRepository } from "../repositories";
@@ -6,14 +5,10 @@ import { MediaFilter } from "../types";
 
 export class MediaService {
   public async fetchMediaPaginated(
-    pagination: Partial<PaginationParams>,
+    pagination: PaginationParams,
     filter: MediaFilter,
   ): Promise<PaginatedResponse<Media>> {
-    const normalizedPagination: PaginationParams = {
-      page: pagination.page ?? 1,
-      limit: Math.min(pagination.limit ?? config.pagination.defaultPageSize, config.pagination.maxPageSize),
-    };
-    return mediaRepository.findAllPaginated(normalizedPagination, filter);
+    return mediaRepository.findAllPaginated(pagination, filter);
   }
 
   public async fetchMediaById(id: string): Promise<Media | null> {

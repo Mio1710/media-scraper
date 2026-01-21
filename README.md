@@ -4,6 +4,10 @@ Media Scraper is a full-stack web application which is used to scrape images and
 
 ---
 
+## Check more
+
+- Problem/deal with url CSR...
+
 ## Features
 
 - **Bulk Scraping:** Input multiple URLs to scrape images and videos in parallel.

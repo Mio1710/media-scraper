@@ -20,6 +20,7 @@ export const useScrapeUrls = () => {
     setIsError(false);
     try {
       const result = await ScraperService.scrapeUrls(urls);
+      await mutate((key) => Array.isArray(key) && key[0] === "scrapeHistory", undefined, { revalidate: true });
       await mutate((key) => Array.isArray(key) && key[0] === "media", undefined, { revalidate: true });
       await mutate(["mediaStats"], undefined, { revalidate: true });
       return result;

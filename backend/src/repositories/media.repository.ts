@@ -59,7 +59,10 @@ export class MediaRepository {
       group: ["type"],
       raw: true,
     });
-    return results as unknown as { type: MediaType; count: number }[];
+    return (results as any[]).map((item) => ({
+      type: item.type,
+      count: parseInt(item.count as unknown as string, 10),
+    }));
   }
 
   public async deleteById(id: string): Promise<number> {

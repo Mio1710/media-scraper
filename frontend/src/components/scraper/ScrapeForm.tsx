@@ -7,40 +7,43 @@ interface UrlInput {
   readonly id: number;
   readonly value: string;
 }
-
+const MAX_URL_INPUTS = 10;
 export const ScrapeForm: React.FC = () => {
   const [urls, setUrls] = useState<UrlInput[]>([{ id: 1, value: "" }]);
   const [results, setResults] = useState<ScrapeJobResult[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const scrapeUrls = useScrapeUrls();
 
-  const handleAddUrl = useCallback((): void => {
-    setUrls((prev) => [...prev, { id: Date.now(), value: "" }]);
-  }, []);
-
-  const handleRemoveUrl = useCallback((id: number): void => {
+  const handleRemoveUrl = (id: number) => {
     setUrls((prev) => {
       if (prev.length === 1) {
         return prev;
       }
       return prev.filter((url) => url.id !== id);
     });
-  }, []);
+  };
 
   const handleUpdateUrl = useCallback((id: number, value: string): void => {
-    setUrls((prev) => prev.map((url) => (url.id === id ? { ...url, value } : url)));
+    const trimValue = value.trim().replaceAll(" ", "");
+    setUrls((prev) => prev.map((url) => (url.id === id ? { ...url, value: trimValue } : url)));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+    setErrorMessage(null);
 
-    const validUrls = urls
-      .map((u) => u.value.trim())
-      .filter((u) => u && (u.startsWith("http://") || u.startsWith("https://")));
-
+    const invalidUrls = urls
+      .map((u) => u.value)
+      .filter((u) => u && !(u.startsWith("http://") || u.startsWith("https://")));
+    if (invalidUrls.length > 0) {
+      setErrorMessage("Please enter at least one valid URL (starting with http:// or https://)");
+      return;
+    }
+    const validUrls = urls.map((u) => u.value).filter((u) => u);
     if (validUrls.length === 0) {
-      alert("Please enter at least one valid URL (starting with http:// or https://)");
+      setErrorMessage("Please enter at least one URL to scrape.");
       return;
     }
 
@@ -52,18 +55,6 @@ export const ScrapeForm: React.FC = () => {
       console.error("Scraping failed:", error);
     }
   };
-
-  const handlePasteMultiple = useCallback((e: React.ClipboardEvent): void => {
-    const pastedText = e.clipboardData.getData("text");
-    const pastedUrls = pastedText
-      .split(/[\n\r\s,]+/)
-      .filter((url) => url.startsWith("http://") || url.startsWith("https://"));
-
-    if (pastedUrls.length > 1) {
-      e.preventDefault();
-      setUrls(pastedUrls.map((url, index) => ({ id: Date.now() + index, value: url })));
-    }
-  }, []);
 
   const handleHideResults = (): void => {
     setShowResults(false);
@@ -91,13 +82,12 @@ export const ScrapeForm: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-3">
+          <div>{errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}</div>
           {urls.map((url, index) => (
             <div key={url.id} className="flex gap-2">
               <input
-                type="url"
                 value={url.value}
                 onChange={(e) => handleUpdateUrl(url.id, e.target.value)}
-                onPaste={index === 0 ? handlePasteMultiple : undefined}
                 placeholder="https://example.com"
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 disabled={scrapeUrls.isPending}
@@ -121,9 +111,9 @@ export const ScrapeForm: React.FC = () => {
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={handleAddUrl}
+            onClick={() => setUrls((prev) => [...prev, { id: Date.now(), value: "" }])}
             className="flex items-center gap-1 px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            disabled={scrapeUrls.isPending}
+            disabled={scrapeUrls.isPending || urls.length >= MAX_URL_INPUTS}
             aria-label="Add another URL input"
           >
             <Plus className="h-4 w-4" />
@@ -132,7 +122,7 @@ export const ScrapeForm: React.FC = () => {
 
           <button
             type="submit"
-            disabled={scrapeUrls.isPending}
+            disabled={scrapeUrls.isPending || (urls.length == 1 && urls[0].value.trim() === "")}
             className="flex items-center gap-2 px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {scrapeUrls.isPending ? (
