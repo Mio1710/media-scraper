@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { scrapeController } from "../controllers";
-import { validateBody, validateParams, validateQuery } from "../middlewares";
-import { idParamSchema, scraperQuerySchema, scrapeUrlsSchema } from "../utils/validators";
+import { validateBody, validateQuery } from "../middlewares";
+import { scraperQuerySchema, scrapeUrlsSchema } from "../utils/validators";
 
 const router = Router();
 
@@ -14,13 +14,6 @@ router.post("/", validateBody(scrapeUrlsSchema), (req, res, next) => scrapeContr
 
 router.get("/", validateQuery(scraperQuerySchema), (req, res, next) =>
   scrapeController.getScrapeHistory(req, res, next),
-);
-/**
- * @route GET /api/scrape/:id
- * @description Get status of a scrape request
- */
-router.get("/:id", validateParams(idParamSchema), (req, res, next) =>
-  scrapeController.handleGetScrapeStatus(req, res, next),
 );
 
 export default router;

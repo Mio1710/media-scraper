@@ -22,27 +22,11 @@ export class ScrapeQueueService {
         url: scrap.sourceUrl,
         retries: 0,
       }));
-      jobs.map((job) => this.processJob(job));
+      jobs.map(async (job) => await this.processJob(job));
       return { totalRequests: urls.length, results };
     } catch (error) {
       throw error;
     }
-  }
-
-  public async fetchJobStatus(requestId: string): Promise<ScrapeJobResult | null> {
-    const request = await scrapeRequestRepository.findById(requestId);
-    if (!request) {
-      return null;
-    }
-    const media = await mediaRepository.findByScrapeRequestId(requestId);
-
-    return {
-      id: request.id,
-      sourceUrl: request.sourceUrl,
-      status: request.status,
-      mediaCount: media.length,
-      errorMessage: request.errorMessage ?? undefined,
-    };
   }
 
   private async processJob(job: QueuedJob): Promise<ScrapeJobResult> {
