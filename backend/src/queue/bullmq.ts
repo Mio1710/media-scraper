@@ -9,8 +9,13 @@ export const requestQueue = new Queue("requests", {
   defaultJobOptions: {
     removeOnComplete: true,
     removeOnFail: {
-      age: 3600,
+      age: 10,
     },
+    backoff: {
+      type: "fixed",
+      delay: 5000,
+    },
+    attempts: 5,
   },
 });
 
@@ -31,9 +36,9 @@ export const requestWorker = new Worker(
 );
 
 requestWorker.on("completed", async (job) => {
-  logger.debug(`requestWorker: Job ${job?.id} completed!`);
+  logger.debug(`requestWorker: Job ${job?.data} completed!`);
 });
 
 requestWorker.on("failed", (job, err: Error) => {
-  logger.error(`requestWorker: Job ${job?.id} failed: ${err.message}`);
+  logger.error(`requestWorker: Job ${job?.data} failed ${job?.attemptsStarted}: ${err.message}`);
 });
